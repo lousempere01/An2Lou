@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>An2Lou - Gestionnaire de Musiques & Playlists</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+  <!-- ======== Modal Nom d'utilisateur ======== -->
+  <div class="username-modal-overlay" id="usernameModal">
+    <div class="username-modal">
+      <i class="fas fa-headphones-alt username-icon"></i>
+      <h2>Bienvenue sur An2Lou</h2>
+      <p>Entrez votre nom pour accéder à votre bibliothèque musicale</p>
+      <input type="text" id="usernameInput" placeholder="Votre prénom..." maxlength="30" autofocus>
+      <button class="btn btn-primary" id="usernameBtn">
+        <i class="fas fa-music"></i> C'est parti !
+      </button>
+    </div>
+  </div>
+
+  <!-- ======== Navbar ======== -->
+  <nav class="navbar">
+    <div class="logo">
+      <i class="fas fa-compact-disc fa-spin-slow"></i> An2Lou
+    </div>
+    <div class="nav-links">
+      <button class="nav-btn active" data-page="songs">
+        <i class="fas fa-music"></i>
+        <span>Musiques</span>
+      </button>
+      <button class="nav-btn" data-page="playlists">
+        <i class="fas fa-list"></i>
+        <span>Playlists</span>
+      </button>
+      <button class="nav-btn" data-page="chat">
+        <i class="fas fa-comments"></i>
+        <span>Chat</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ======== Main Container ======== -->
+  <div class="main-container">
+
+    <!-- ======== Section Musiques ======== -->
+    <section class="page-section active" id="songsPage">
+      <div class="page-header">
+        <h1><i class="fas fa-music"></i> Ma Bibliothèque</h1>
+        <p>Gérez votre collection de musiques</p>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-bar">
+        <div class="stat-card">
+          <div class="stat-number" id="totalSongs">0</div>
+          <div class="stat-label">Titres</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="totalArtists">0</div>
+          <div class="stat-label">Artistes</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="totalFavorites">0</div>
+          <div class="stat-label">Favoris</div>
+        </div>
+      </div>
+
+      <!-- Ajout de musique -->
+      <div class="add-section">
+        <div class="add-section-header" id="toggleAddSong">
+          <h3><i class="fas fa-plus-circle"></i> Ajouter une musique</h3>
+          <i class="fas fa-chevron-down toggle-icon"></i>
+        </div>
+        <form class="add-form" id="addSongForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="newSongTitle">Titre *</label>
+              <input type="text" id="newSongTitle" placeholder="Titre du morceau..." required>
+            </div>
+            <div class="form-group">
+              <label for="newSongArtist">Artiste *</label>
+              <input type="text" id="newSongArtist" placeholder="Nom de l'artiste..." required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="newSongAlbum">Album</label>
+              <input type="text" id="newSongAlbum" placeholder="Nom de l'album...">
+            </div>
+            <div class="form-group">
+              <label for="newSongGenre">Genre</label>
+              <select id="newSongGenre">
+                <option value="Pop">🎵 Pop</option>
+                <option value="Rock">🎸 Rock</option>
+                <option value="Hip-Hop">🎤 Hip-Hop</option>
+                <option value="Rap">🔥 Rap</option>
+                <option value="Électro">⚡ Électro</option>
+                <option value="Jazz">🎷 Jazz</option>
+                <option value="Classique">🎻 Classique</option>
+                <option value="R&B">💜 R&B</option>
+                <option value="Reggae">🌴 Reggae</option>
+                <option value="Metal">🤘 Metal</option>
+                <option value="Folk">🪕 Folk</option>
+                <option value="Autre">🎶 Autre</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="newSongCover">URL Pochette</label>
+              <input type="url" id="newSongCover" placeholder="https://exemple.com/cover.jpg">
+            </div>
+            <div class="form-group form-group-small">
+              <label for="newSongDuration">Durée</label>
+              <input type="text" id="newSongDuration" placeholder="3:45">
+            </div>
+            <div class="form-group form-group-small">
+              <label for="newSongYear">Année</label>
+              <input type="number" id="newSongYear" placeholder="2025" min="1900" max="2030">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="cover-preview" id="coverPreview">
+              <i class="fas fa-image"></i>
+              <span>Aperçu pochette</span>
+            </div>
+            <button type="submit" class="btn btn-primary btn-add">
+              <i class="fas fa-plus"></i> Ajouter le morceau
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Contrôles (recherche + filtres) -->
+      <div class="controls">
+        <div class="search-bar">
+          <i class="fas fa-search"></i>
+          <input type="text" id="searchInput" placeholder="Rechercher un titre, artiste, album...">
+        </div>
+        <div class="filter-group">
+          <select class="filter-select" id="filterGenre">
+            <option value="">Tous genres</option>
+            <option value="Pop">Pop</option>
+            <option value="Rock">Rock</option>
+            <option value="Hip-Hop">Hip-Hop</option>
+            <option value="Rap">Rap</option>
+            <option value="Électro">Électro</option>
+            <option value="Jazz">Jazz</option>
+            <option value="Classique">Classique</option>
+            <option value="R&B">R&B</option>
+            <option value="Reggae">Reggae</option>
+            <option value="Metal">Metal</option>
+            <option value="Folk">Folk</option>
+            <option value="Autre">Autre</option>
+          </select>
+          <select class="filter-select" id="filterFavorite">
+            <option value="">Tous</option>
+            <option value="true">⭐ Favoris</option>
+          </select>
+          <select class="filter-select" id="sortSelect">
+            <option value="createdAt-desc">Plus récents</option>
+            <option value="createdAt-asc">Plus anciens</option>
+            <option value="title-asc">Titre A-Z</option>
+            <option value="title-desc">Titre Z-A</option>
+            <option value="artist-asc">Artiste A-Z</option>
+            <option value="artist-desc">Artiste Z-A</option>
+            <option value="year-desc">Année ↓</option>
+            <option value="year-asc">Année ↑</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Grille des musiques -->
+      <div class="songs-grid" id="songsList">
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <span>Chargement de la bibliothèque...</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== Section Playlists ======== -->
+    <section class="page-section" id="playlistsPage">
+      <div class="page-header">
+        <h1><i class="fas fa-list"></i> Mes Playlists</h1>
+        <p>Créez et gérez vos playlists personnalisées</p>
+      </div>
+
+      <!-- Créer une playlist -->
+      <div class="add-section">
+        <div class="add-section-header" id="toggleAddPlaylist">
+          <h3><i class="fas fa-plus-circle"></i> Nouvelle playlist</h3>
+          <i class="fas fa-chevron-down toggle-icon"></i>
+        </div>
+        <form class="add-form" id="addPlaylistForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="newPlaylistName">Nom *</label>
+              <input type="text" id="newPlaylistName" placeholder="Ma super playlist..." required>
+            </div>
+            <div class="form-group">
+              <label for="newPlaylistDesc">Description</label>
+              <input type="text" id="newPlaylistDesc" placeholder="Ambiance chill pour l'été...">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="newPlaylistCover">URL Pochette</label>
+              <input type="url" id="newPlaylistCover" placeholder="https://exemple.com/cover.jpg">
+            </div>
+            <button type="submit" class="btn btn-primary btn-add">
+              <i class="fas fa-plus"></i> Créer la playlist
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Liste des playlists -->
+      <div class="playlists-grid" id="playlistsList">
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <span>Chargement des playlists...</span>
+        </div>
+      </div>
+
+      <!-- Vue détail playlist -->
+      <div class="playlist-detail hidden" id="playlistDetail">
+        <div class="playlist-detail-header">
+          <button class="btn btn-ghost btn-back" id="backToPlaylists">
+            <i class="fas fa-arrow-left"></i> Retour
+          </button>
+          <div class="playlist-detail-info">
+            <div class="playlist-detail-cover" id="detailCover">
+              <i class="fas fa-music"></i>
+            </div>
+            <div>
+              <h2 id="detailName">Playlist</h2>
+              <p id="detailDesc" class="text-muted"></p>
+              <span id="detailCount" class="text-muted">0 titres</span>
+            </div>
+          </div>
+          <div class="playlist-detail-actions">
+            <button class="btn btn-primary btn-sm" id="addSongToPlaylistBtn">
+              <i class="fas fa-plus"></i> Ajouter des titres
+            </button>
+          </div>
+        </div>
+        <div class="playlist-songs-list" id="playlistSongsList">
+          <!-- Musiques de la playlist -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ======== Section Chat ======== -->
+    <section class="page-section" id="chatPage">
+      <div class="page-header">
+        <h1><i class="fas fa-comments"></i> Chat en direct</h1>
+        <p>Discutez musique en temps réel avec les autres utilisateurs</p>
+      </div>
+
+      <div class="chat-container">
+        <div class="chat-main">
+          <div class="chat-header">
+            <h3><i class="fas fa-hashtag"></i> Général</h3>
+            <div class="chat-status">
+              <div class="status-dot"></div>
+              <span id="onlineCount">0 en ligne</span>
+            </div>
+          </div>
+          <div class="chat-messages" id="chatMessages"></div>
+          <div class="typing-indicator" id="typingIndicator"></div>
+          <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Partagez vos découvertes musicales..." maxlength="1000">
+            <button class="btn btn-primary" id="sendMessageBtn">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+        <div class="chat-sidebar">
+          <h4><i class="fas fa-users"></i> En ligne</h4>
+          <div id="onlineUsers"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ======== Modal Édition Musique ======== -->
+  <div class="modal-overlay" id="editSongModal">
+    <div class="modal">
+      <h2><i class="fas fa-edit"></i> Modifier la musique</h2>
+      <form class="modal-form" id="editSongForm">
+        <input type="hidden" id="editSongId">
+        <div class="form-group">
+          <label for="editSongTitle">Titre</label>
+          <input type="text" id="editSongTitle" required>
+        </div>
+        <div class="form-group">
+          <label for="editSongArtist">Artiste</label>
+          <input type="text" id="editSongArtist" required>
+        </div>
+        <div class="form-group">
+          <label for="editSongAlbum">Album</label>
+          <input type="text" id="editSongAlbum">
+        </div>
+        <div class="form-group">
+          <label for="editSongGenre">Genre</label>
+          <select id="editSongGenre">
+            <option value="Pop">Pop</option>
+            <option value="Rock">Rock</option>
+            <option value="Hip-Hop">Hip-Hop</option>
+            <option value="Rap">Rap</option>
+            <option value="Électro">Électro</option>
+            <option value="Jazz">Jazz</option>
+            <option value="Classique">Classique</option>
+            <option value="R&B">R&B</option>
+            <option value="Reggae">Reggae</option>
+            <option value="Metal">Metal</option>
+            <option value="Folk">Folk</option>
+            <option value="Autre">Autre</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="editSongCover">URL Pochette</label>
+          <input type="url" id="editSongCover">
+        </div>
+        <div class="form-row">
+          <div class="form-group form-group-small">
+            <label for="editSongDuration">Durée</label>
+            <input type="text" id="editSongDuration" placeholder="3:45">
+          </div>
+          <div class="form-group form-group-small">
+            <label for="editSongYear">Année</label>
+            <input type="number" id="editSongYear" min="1900" max="2030">
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="cancelEditSongBtn">Annuler</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Sauvegarder
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======== Modal Ajouter musique à playlist ======== -->
+  <div class="modal-overlay" id="addToPlaylistModal">
+    <div class="modal modal-large">
+      <h2><i class="fas fa-plus-circle"></i> Ajouter des titres</h2>
+      <div class="modal-search">
+        <div class="search-bar">
+          <i class="fas fa-search"></i>
+          <input type="text" id="playlistSearchInput" placeholder="Rechercher un titre...">
+        </div>
+      </div>
+      <div class="modal-song-list" id="modalSongList">
+        <!-- Liste des musiques disponibles -->
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="closeAddToPlaylistBtn">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== Toast Container ======== -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ======== Scripts ======== -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
