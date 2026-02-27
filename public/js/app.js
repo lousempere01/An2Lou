@@ -86,6 +86,7 @@ async function loadSongs() {
     const res = await fetch(`/api/songs?${params.toString()}`);
     const songs = await res.json();
     allSongs = songs;
+    updateCounters(songs);
     renderSongs(songs);
   } catch (err) {
     console.error('Erreur chargement musiques:', err);
@@ -97,6 +98,15 @@ async function loadSongs() {
       </div>
     `;
   }
+}
+
+function updateCounters(songs) {
+  const total = songs.length;
+  const favs = songs.filter(s => s.favorite).length;
+  const elTotal = $('#totalSongs');
+  const elFavs = $('#totalFavorites');
+  if (elTotal) elTotal.textContent = total;
+  if (elFavs) elFavs.textContent = favs;
 }
 
 function renderSongs(songs) {

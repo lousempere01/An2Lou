@@ -113,6 +113,38 @@ body {
   color: var(--primary);
 }
 
+/* Compteurs */
+
+.stats-counters {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.stat-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.6rem 1.4rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+}
+
+.stat-item i {
+  color: var(--primary);
+}
+
+.stat-item span {
+  color: var(--text);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
 /* Formulaire accordéon */
 
 .add-section {
