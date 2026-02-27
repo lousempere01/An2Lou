@@ -1211,8 +1211,6 @@ input::placeholder {
   flex: 1;
 }
 
-/* ---- Chargement ---- */
-
 .spinner {
   display: inline-block;
   width: 18px;
