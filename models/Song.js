@@ -21,7 +21,7 @@ const songSchema = new mongoose.Schema({
   },
   genre: {
     type: String,
-    enum: ['Pop', 'Rock', 'Hip-Hop', 'Rap', 'Électro', 'Jazz', 'Classique', 'R&B', 'Reggae', 'Metal', 'Folk', 'Autre'],
+    enum: ['Pop', 'Rock', 'Hip-Hop', 'Rap', 'Électro', 'Autre'],
     default: 'Pop'
   },
   coverUrl: {
