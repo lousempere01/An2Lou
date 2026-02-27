@@ -38,8 +38,8 @@ router.get('/:id', async (req, res) => {
 // Creer une musique
 router.post('/', async (req, res) => {
   try {
-    const { title, artist, album, genre } = req.body;
-    const song = new Song({ title, artist, album, genre });
+    const { title, artist, album, genre, coverUrl } = req.body;
+    const song = new Song({ title, artist, album, genre, coverUrl });
     const savedSong = await song.save();
     res.status(201).json(savedSong);
   } catch (err) {
@@ -50,10 +50,10 @@ router.post('/', async (req, res) => {
 // Modifier une musique
 router.put('/:id', async (req, res) => {
   try {
-    const { title, artist, album, genre } = req.body;
+    const { title, artist, album, genre, coverUrl } = req.body;
     const song = await Song.findByIdAndUpdate(
       req.params.id,
-      { title, artist, album, genre },
+      { title, artist, album, genre, coverUrl },
       { new: true, runValidators: true }
     );
     if (!song) {

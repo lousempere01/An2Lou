@@ -157,7 +157,8 @@ function initAddSongForm() {
           title,
           artist,
           album: $('#newSongAlbum').value.trim() || 'Single',
-          genre: $('#newSongGenre').value
+          genre: $('#newSongGenre').value,
+          coverUrl: $('#newSongCover').value.trim()
         })
       });
 
@@ -214,7 +215,8 @@ function initEditSongModal() {
           title: $('#editSongTitle').value.trim(),
           artist: $('#editSongArtist').value.trim(),
           album: $('#editSongAlbum').value.trim(),
-          genre: $('#editSongGenre').value
+          genre: $('#editSongGenre').value,
+          coverUrl: $('#editSongCover').value.trim()
         })
       });
 
@@ -241,6 +243,7 @@ async function openEditSongModal(id) {
     $('#editSongArtist').value = song.artist;
     $('#editSongAlbum').value = song.album || '';
     $('#editSongGenre').value = song.genre;
+    $('#editSongCover').value = song.coverUrl || '';
     $('#editSongModal').classList.add('active');
   } catch (err) {
     showToast('Erreur', 'error');
