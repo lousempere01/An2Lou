@@ -8,16 +8,15 @@ let allSongs = [];
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 
-// ---- Initialisation ----
+// Initialisation
 document.addEventListener('DOMContentLoaded', () => {
   initNavigation();
   initUsernameModal();
   initAddSongForm();
   initAddPlaylistForm();
-  initSongControls();
+  initSearch();
   initEditSongModal();
   initCollapsibles();
-  initCoverPreview();
   initPlaylistDetail();
   initAddToPlaylistModal();
   loadSongs();
@@ -32,7 +31,6 @@ function initNavigation() {
       btn.classList.add('active');
       $$('.page-section').forEach(s => s.classList.remove('active'));
       $(`#${page}Page`).classList.add('active');
-
       if (page === 'playlists') loadPlaylists();
       if (page === 'songs') loadSongs();
     });
@@ -50,23 +48,6 @@ function initCollapsibles() {
   });
 }
 
-function initCoverPreview() {
-  const coverInput = $('#newSongCover');
-  const preview = $('#coverPreview');
-  if (coverInput && preview) {
-    coverInput.addEventListener('input', () => {
-      const url = coverInput.value.trim();
-      if (url) {
-        preview.innerHTML = `<img src="${url}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-image\\'></i><span>URL invalide</span>';this.parentElement.classList.remove('has-image');">`;
-        preview.classList.add('has-image');
-      } else {
-        preview.innerHTML = '<i class="fas fa-image"></i><span>Aperçu pochette</span>';
-        preview.classList.remove('has-image');
-      }
-    });
-  }
-}
-
 function initUsernameModal() {
   const saved = localStorage.getItem('an2lou_username');
   if (saved) {
@@ -75,7 +56,6 @@ function initUsernameModal() {
     initChat();
     return;
   }
-
   $('#usernameBtn').addEventListener('click', submitUsername);
   $('#usernameInput').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') submitUsername();
@@ -95,38 +75,25 @@ function submitUsername() {
   showToast('Bienvenue ' + name, 'success');
 }
 
+// ---- Musiques ----
+
 async function loadSongs() {
   const params = new URLSearchParams();
-
   const search = $('#searchInput')?.value?.trim();
   if (search) params.set('search', search);
-
-  const genre = $('#filterGenre')?.value;
-  if (genre) params.set('genre', genre);
-
-  const favorite = $('#filterFavorite')?.value;
-  if (favorite) params.set('favorite', favorite);
-
-  const sortVal = $('#sortSelect')?.value;
-  if (sortVal) {
-    const [sort, order] = sortVal.split('-');
-    params.set('sort', sort);
-    params.set('order', order);
-  }
 
   try {
     const res = await fetch(`/api/songs?${params.toString()}`);
     const songs = await res.json();
     allSongs = songs;
     renderSongs(songs);
-    updateStats(songs);
   } catch (err) {
     console.error('Erreur chargement musiques:', err);
     $('#songsList').innerHTML = `
       <div class="empty-state">
         <i class="fas fa-exclamation-triangle"></i>
         <h3>Erreur de connexion</h3>
-        <p>Impossible de charger la bibliothèque. Vérifiez le serveur.</p>
+        <p>Impossible de charger les musiques.</p>
       </div>
     `;
   }
@@ -140,7 +107,7 @@ function renderSongs(songs) {
       <div class="empty-state">
         <i class="fas fa-compact-disc"></i>
         <h3>Aucune musique</h3>
-        <p>Ajoutez votre premier morceau pour commencer votre collection !</p>
+        <p>Ajoutez votre premier morceau !</p>
       </div>
     `;
     return;
@@ -148,9 +115,6 @@ function renderSongs(songs) {
 
   grid.innerHTML = songs.map(song => `
     <div class="song-card" data-id="${song._id}">
-      <button class="song-favorite ${song.favorite ? 'active' : ''}" onclick="toggleFavorite('${song._id}')" title="Favori">
-        <i class="fas fa-heart"></i>
-      </button>
       <div class="song-cover">
         ${song.coverUrl
           ? `<img src="${escapeHtml(song.coverUrl)}" alt="${escapeHtml(song.title)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
@@ -158,41 +122,24 @@ function renderSongs(songs) {
         <div class="cover-placeholder" ${song.coverUrl ? 'style="display:none"' : ''}>
           <i class="fas fa-music"></i>
         </div>
-        <div class="song-cover-overlay">
-          <div class="song-cover-actions">
-            <button class="btn btn-primary" onclick="openEditSongModal('${song._id}')" title="Modifier">
-              <i class="fas fa-pen"></i>
-            </button>
-            <button class="btn btn-danger" onclick="deleteSong('${song._id}')" title="Supprimer">
-              <i class="fas fa-trash"></i>
-            </button>
-          </div>
-        </div>
       </div>
       <div class="song-info">
         <div class="song-title">${escapeHtml(song.title)}</div>
         <div class="song-artist">${escapeHtml(song.artist)}</div>
         <div class="song-details">
           <span class="song-genre">${escapeHtml(song.genre)}</span>
-          <span>${song.duration || ''} ${song.year ? '· ' + song.year : ''}</span>
+          <div class="song-actions">
+            <button class="btn btn-sm btn-ghost" onclick="openEditSongModal('${song._id}')" title="Modifier">
+              <i class="fas fa-pen"></i>
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="deleteSong('${song._id}')" title="Supprimer">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
   `).join('');
-}
-
-function updateStats(songs) {
-  const total = songs.length;
-  const artists = new Set(songs.map(s => s.artist)).size;
-  const favorites = songs.filter(s => s.favorite).length;
-
-  animateNumber($('#totalSongs'), total);
-  animateNumber($('#totalArtists'), artists);
-  animateNumber($('#totalFavorites'), favorites);
-}
-
-function animateNumber(el, target) {
-  if (el) el.textContent = target;
 }
 
 function initAddSongForm() {
@@ -210,40 +157,22 @@ function initAddSongForm() {
           title,
           artist,
           album: $('#newSongAlbum').value.trim() || 'Single',
-          genre: $('#newSongGenre').value,
-          coverUrl: $('#newSongCover').value.trim(),
-          duration: $('#newSongDuration').value.trim(),
-          year: parseInt($('#newSongYear').value) || new Date().getFullYear()
+          genre: $('#newSongGenre').value
         })
       });
 
       if (res.ok) {
         $('#addSongForm').reset();
-        $('#coverPreview').innerHTML = '<i class="fas fa-image"></i><span>Aperçu pochette</span>';
-        $('#coverPreview').classList.remove('has-image');
         loadSongs();
         showToast('Morceau ajouté !', 'success');
       } else {
         const data = await res.json();
-        showToast(data.message || 'Erreur lors de l\'ajout', 'error');
+        showToast(data.message || 'Erreur', 'error');
       }
     } catch (err) {
       showToast('Erreur de connexion', 'error');
     }
   });
-}
-
-async function toggleFavorite(id) {
-  try {
-    const res = await fetch(`/api/songs/${id}/favorite`, { method: 'PATCH' });
-    if (res.ok) {
-      const song = await res.json();
-      loadSongs();
-      showToast(song.favorite ? 'Ajouté aux favoris' : 'Retiré des favoris', song.favorite ? 'success' : 'info');
-    }
-  } catch (err) {
-    showToast('Erreur', 'error');
-  }
 }
 
 async function deleteSong(id) {
@@ -254,20 +183,18 @@ async function deleteSong(id) {
       showToast('Morceau supprimé', 'info');
     }
   } catch (err) {
-    showToast('Erreur lors de la suppression', 'error');
-    loadSongs();
+    showToast('Erreur', 'error');
   }
 }
 
-function initSongControls() {
+function initSearch() {
   $('#searchInput').addEventListener('input', () => {
     clearTimeout(debounceTimeout);
     debounceTimeout = setTimeout(loadSongs, 300);
   });
-  $('#filterGenre').addEventListener('change', loadSongs);
-  $('#filterFavorite').addEventListener('change', loadSongs);
-  $('#sortSelect').addEventListener('change', loadSongs);
 }
+
+// ---- Édition musique ----
 
 function initEditSongModal() {
   $('#cancelEditSongBtn').addEventListener('click', closeEditSongModal);
@@ -287,10 +214,7 @@ function initEditSongModal() {
           title: $('#editSongTitle').value.trim(),
           artist: $('#editSongArtist').value.trim(),
           album: $('#editSongAlbum').value.trim(),
-          genre: $('#editSongGenre').value,
-          coverUrl: $('#editSongCover').value.trim(),
-          duration: $('#editSongDuration').value.trim(),
-          year: parseInt($('#editSongYear').value) || new Date().getFullYear()
+          genre: $('#editSongGenre').value
         })
       });
 
@@ -300,7 +224,7 @@ function initEditSongModal() {
         showToast('Morceau modifié !', 'success');
       } else {
         const data = await res.json();
-        showToast(data.message || 'Erreur lors de la modification', 'error');
+        showToast(data.message || 'Erreur', 'error');
       }
     } catch (err) {
       showToast('Erreur de connexion', 'error');
@@ -312,25 +236,22 @@ async function openEditSongModal(id) {
   try {
     const res = await fetch(`/api/songs/${id}`);
     const song = await res.json();
-
     $('#editSongId').value = song._id;
     $('#editSongTitle').value = song.title;
     $('#editSongArtist').value = song.artist;
     $('#editSongAlbum').value = song.album || '';
     $('#editSongGenre').value = song.genre;
-    $('#editSongCover').value = song.coverUrl || '';
-    $('#editSongDuration').value = song.duration || '';
-    $('#editSongYear').value = song.year || '';
-
     $('#editSongModal').classList.add('active');
   } catch (err) {
-    showToast('Erreur lors du chargement', 'error');
+    showToast('Erreur', 'error');
   }
 }
 
 function closeEditSongModal() {
   $('#editSongModal').classList.remove('active');
 }
+
+// ---- Playlists ----
 
 async function loadPlaylists() {
   try {
@@ -351,39 +272,31 @@ function renderPlaylists(playlists) {
       <div class="empty-state">
         <i class="fas fa-headphones-alt"></i>
         <h3>Aucune playlist</h3>
-        <p>Créez votre première playlist ci-dessus !</p>
+        <p>Créez votre première playlist !</p>
       </div>
     `;
     return;
   }
 
-  grid.innerHTML = playlists.map(pl => {
-    const coverSrc = pl.coverUrl || (pl.songs.length > 0 && pl.songs[0].coverUrl) || '';
-    return `
-      <div class="playlist-card" onclick="openPlaylistDetail('${pl._id}')">
-        <div class="playlist-cover">
-          ${coverSrc
-            ? `<img src="${escapeHtml(coverSrc)}" alt="${escapeHtml(pl.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-            : ''}
-          <div class="cover-placeholder" ${coverSrc ? 'style="display:none"' : ''}>
-            <i class="fas fa-music"></i>
-          </div>
-        </div>
-        <div class="playlist-info">
-          <div class="playlist-name">${escapeHtml(pl.name)}</div>
-          <div class="playlist-desc">${escapeHtml(pl.description || '')}</div>
-          <div class="playlist-meta">
-            <span class="playlist-count">${pl.songs.length} titre${pl.songs.length !== 1 ? 's' : ''}</span>
-            <div class="playlist-actions">
-              <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deletePlaylist('${pl._id}')" title="Supprimer">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </div>
+  grid.innerHTML = playlists.map(pl => `
+    <div class="playlist-card" onclick="openPlaylistDetail('${pl._id}')">
+      <div class="playlist-cover">
+        <div class="cover-placeholder">
+          <i class="fas fa-music"></i>
         </div>
       </div>
-    `;
-  }).join('');
+      <div class="playlist-info">
+        <div class="playlist-name">${escapeHtml(pl.name)}</div>
+        <div class="playlist-desc">${escapeHtml(pl.description || '')}</div>
+        <div class="playlist-meta">
+          <span class="playlist-count">${pl.songs.length} titre${pl.songs.length !== 1 ? 's' : ''}</span>
+          <button class="btn btn-sm btn-danger" onclick="event.stopPropagation();deletePlaylist('${pl._id}')" title="Supprimer">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  `).join('');
 }
 
 function initAddPlaylistForm() {
@@ -398,8 +311,7 @@ function initAddPlaylistForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name,
-          description: $('#newPlaylistDesc').value.trim(),
-          coverUrl: $('#newPlaylistCover').value.trim()
+          description: $('#newPlaylistDesc').value.trim()
         })
       });
 
@@ -429,6 +341,8 @@ async function deletePlaylist(id) {
   }
 }
 
+// ---- Détail playlist ----
+
 function initPlaylistDetail() {
   $('#backToPlaylists').addEventListener('click', closePlaylistDetail);
 }
@@ -439,27 +353,18 @@ async function openPlaylistDetail(id) {
     const res = await fetch(`/api/playlists/${id}`);
     const playlist = await res.json();
 
-    // Afficher la vue détail, masquer la grille et le formulaire
     $('#playlistsList').classList.add('hidden');
     $$('#playlistsPage .add-section').forEach(s => s.classList.add('hidden'));
     $('#playlistDetail').classList.remove('hidden');
 
-    // Remplir les infos
     $('#detailName').textContent = playlist.name;
     $('#detailDesc').textContent = playlist.description || '';
     $('#detailCount').textContent = `${playlist.songs.length} titre${playlist.songs.length !== 1 ? 's' : ''}`;
-
-    const detailCover = $('#detailCover');
-    const coverSrc = playlist.coverUrl || (playlist.songs.length > 0 && playlist.songs[0].coverUrl) || '';
-    if (coverSrc) {
-      detailCover.innerHTML = `<img src="${escapeHtml(coverSrc)}" onerror="this.outerHTML='<i class=\\'fas fa-music\\'></i>'">`;
-    } else {
-      detailCover.innerHTML = '<i class="fas fa-music"></i>';
-    }
+    $('#detailCover').innerHTML = '<i class="fas fa-music"></i>';
 
     renderPlaylistSongs(playlist.songs);
   } catch (err) {
-    showToast('Erreur lors du chargement', 'error');
+    showToast('Erreur', 'error');
   }
 }
 
@@ -488,16 +393,10 @@ function renderPlaylistSongs(songs) {
   list.innerHTML = songs.map((song, index) => `
     <div class="playlist-song-item">
       <span class="text-muted" style="width:20px;text-align:center;font-size:0.8rem">${index + 1}</span>
-      <div class="playlist-song-cover">
-        ${song.coverUrl
-          ? `<img src="${escapeHtml(song.coverUrl)}" onerror="this.outerHTML='<i class=\\'fas fa-music\\'></i>'">`
-          : '<i class="fas fa-music"></i>'}
-      </div>
       <div class="playlist-song-info">
         <div class="playlist-song-title">${escapeHtml(song.title)}</div>
-        <div class="playlist-song-artist">${escapeHtml(song.artist)} ${song.album ? '· ' + escapeHtml(song.album) : ''}</div>
+        <div class="playlist-song-artist">${escapeHtml(song.artist)}</div>
       </div>
-      <span class="playlist-song-duration">${song.duration || ''}</span>
       <button class="btn btn-sm btn-danger" onclick="removeSongFromPlaylist('${song._id}')" title="Retirer">
         <i class="fas fa-times"></i>
       </button>
@@ -513,12 +412,14 @@ async function removeSongFromPlaylist(songId) {
       const playlist = await res.json();
       renderPlaylistSongs(playlist.songs);
       $('#detailCount').textContent = `${playlist.songs.length} titre${playlist.songs.length !== 1 ? 's' : ''}`;
-      showToast('Titre retiré de la playlist', 'info');
+      showToast('Titre retiré', 'info');
     }
   } catch (err) {
     showToast('Erreur', 'error');
   }
 }
+
+// ---- Modal ajout à playlist ----
 
 function initAddToPlaylistModal() {
   $('#addSongToPlaylistBtn').addEventListener('click', openAddToPlaylistModal);
@@ -526,7 +427,6 @@ function initAddToPlaylistModal() {
   $('#addToPlaylistModal').addEventListener('click', (e) => {
     if (e.target === $('#addToPlaylistModal')) closeAddToPlaylistModal();
   });
-
   $('#playlistSearchInput').addEventListener('input', () => {
     const query = $('#playlistSearchInput').value.trim().toLowerCase();
     renderModalSongList(query);
@@ -535,8 +435,6 @@ function initAddToPlaylistModal() {
 
 async function openAddToPlaylistModal() {
   if (!currentPlaylistId) return;
-
-  // Charger toutes les musiques et la playlist courante
   try {
     const [songsRes, plRes] = await Promise.all([
       fetch('/api/songs'),
@@ -574,24 +472,12 @@ function renderModalSongList(query = '', existingIds = null) {
     return;
   }
 
-  // Déterminer les IDs déjà dans la playlist
-  let addedIds = existingIds;
-  if (!addedIds) {
-    addedIds = [];
-    $$('.modal-song-item.added').forEach(el => {
-      addedIds.push(el.dataset.id);
-    });
-  }
+  let addedIds = existingIds || [];
 
   list.innerHTML = filtered.map(song => {
-    const isAdded = addedIds && addedIds.includes(song._id);
+    const isAdded = addedIds.includes(song._id);
     return `
       <div class="modal-song-item ${isAdded ? 'added' : ''}" data-id="${song._id}">
-        <div class="mini-cover">
-          ${song.coverUrl
-            ? `<img src="${escapeHtml(song.coverUrl)}" onerror="this.outerHTML='<i class=\\'fas fa-music\\'></i>'">`
-            : '<i class="fas fa-music"></i>'}
-        </div>
         <div class="modal-song-item-info">
           <div class="modal-song-item-title">${escapeHtml(song.title)}</div>
           <div class="modal-song-item-artist">${escapeHtml(song.artist)}</div>
@@ -618,14 +504,12 @@ async function addSongToPlaylist(songId, btnEl) {
       const playlist = await res.json();
       renderPlaylistSongs(playlist.songs);
       $('#detailCount').textContent = `${playlist.songs.length} titre${playlist.songs.length !== 1 ? 's' : ''}`;
-
-      // Marquer comme ajouté dans le modal
       const item = btnEl.closest('.modal-song-item');
       if (item) {
         item.classList.add('added');
         btnEl.outerHTML = '<span class="text-muted" style="font-size:0.75rem">Ajouté</span>';
       }
-      showToast('Titre ajouté à la playlist !', 'success');
+      showToast('Titre ajouté !', 'success');
     } else {
       const data = await res.json();
       showToast(data.message || 'Erreur', 'error');
@@ -634,6 +518,8 @@ async function addSongToPlaylist(songId, btnEl) {
     showToast('Erreur', 'error');
   }
 }
+
+// ---- Chat ----
 
 function initChat() {
   socket = io();
@@ -660,7 +546,7 @@ function initChat() {
 
   socket.on('chat:typing', (username) => {
     if (username !== currentUser) {
-      $('#typingIndicator').textContent = `${username} est en train d'écrire...`;
+      $('#typingIndicator').textContent = `${username} écrit...`;
     }
   });
 
@@ -697,7 +583,6 @@ function sendMessage() {
   const input = $('#chatInput');
   const text = input.value.trim();
   if (!text || !socket) return;
-
   socket.emit('chat:message', { username: currentUser, text });
   input.value = '';
   socket.emit('chat:stop-typing', currentUser);
@@ -746,6 +631,8 @@ function scrollChatToBottom() {
   container.scrollTop = container.scrollHeight;
 }
 
+// ---- Utilitaires ----
+
 function showToast(message, type = 'info') {
   const container = $('#toastContainer');
   const toast = document.createElement('div');
@@ -760,10 +647,7 @@ function showToast(message, type = 'info') {
     <span class="toast-text">${message}</span>
   `;
   container.appendChild(toast);
-  setTimeout(() => {
-    toast.style.animation = 'toastOut 0.4s ease forwards';
-    setTimeout(() => toast.remove(), 400);
-  }, 3000);
+  setTimeout(() => toast.remove(), 3000);
 }
 
 function escapeHtml(str) {
@@ -771,22 +655,4 @@ function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
-}
-
-function formatDate(dateStr) {
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffMs = now - date;
-  const diffMin = Math.floor(diffMs / 60000);
-  const diffH = Math.floor(diffMs / 3600000);
-  const diffD = Math.floor(diffMs / 86400000);
-
-  if (diffMin < 1) return 'À l\'instant';
-  if (diffMin < 60) return `il y a ${diffMin} min`;
-  if (diffH < 24) return `il y a ${diffH}h`;
-  if (diffD < 7) return `il y a ${diffD}j`;
-  return date.toLocaleDateString('fr-FR', {
-    day: 'numeric', month: 'short',
-    year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
-  });
 }
