@@ -539,11 +539,6 @@ function initChat() {
     appendNotification(data.text);
   });
 
-  socket.on('users:online', (users) => {
-    renderOnlineUsers(users);
-    $('#onlineCount').textContent = `${users.length} en ligne`;
-  });
-
   socket.on('chat:typing', (username) => {
     if (username !== currentUser) {
       $('#typingIndicator').textContent = `${username} écrit...`;
@@ -614,16 +609,6 @@ function appendNotification(text) {
   notif.textContent = text;
   container.appendChild(notif);
   scrollChatToBottom();
-}
-
-function renderOnlineUsers(users) {
-  const container = $('#onlineUsers');
-  container.innerHTML = users.map(u => `
-    <div class="online-user">
-      <div class="status-dot"></div>
-      <span>${escapeHtml(u)}</span>
-    </div>
-  `).join('');
 }
 
 function scrollChatToBottom() {
