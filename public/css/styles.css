@@ -666,14 +666,13 @@ input::placeholder {
 /* Chat */
 
 .chat-container {
-  display: grid;
-  grid-template-columns: 1fr 180px;
-  gap: 1rem;
+  display: flex;
   height: calc(100vh - 200px);
   min-height: 400px;
 }
 
 .chat-main {
+  flex: 1;
   display: flex;
   flex-direction: column;
   background: var(--bg-card);
@@ -685,28 +684,10 @@ input::placeholder {
 .chat-header {
   padding: 0.8rem 1rem;
   border-bottom: 1px solid var(--border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .chat-header h3 {
   font-size: 1rem;
-}
-
-.chat-status {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--primary);
 }
 
 .chat-messages {
@@ -809,40 +790,6 @@ input::placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.chat-sidebar {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.8rem;
-  overflow-y: auto;
-}
-
-.chat-sidebar h4 {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 0.8rem;
-}
-
-.online-user {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0.4rem;
-  border-radius: 6px;
-  margin-bottom: 3px;
-}
-
-.online-user .status-dot {
-  width: 7px;
-  height: 7px;
-}
-
-.online-user span {
-  font-size: 0.82rem;
 }
 
 /* Modal nom d'utilisateur */
@@ -1017,7 +964,5 @@ input::placeholder {
   .page-header h1 { font-size: 1.4rem; }
   .songs-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
   .playlists-grid { grid-template-columns: 1fr; }
-  .chat-container { grid-template-columns: 1fr; }
-  .chat-sidebar { display: none; }
   .form-row { flex-direction: column; }
 }
