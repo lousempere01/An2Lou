@@ -1,14 +1,8 @@
-// ============================================================
-// Projet An2Lou - Gestionnaire de Musiques & Chat
-// Auteurs : Lou Sempere
-// Routes API : Playlists (CRUD)
-// ============================================================
-
 const express = require('express');
 const router = express.Router();
 const Playlist = require('../models/Playlist');
 
-// GET /api/playlists - Récupérer toutes les playlists
+// Toutes les playlists
 router.get('/', async (req, res) => {
   try {
     const { search } = req.query;
@@ -25,7 +19,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/playlists/:id - Récupérer une playlist par son ID
+// Playlist par ID
 router.get('/:id', async (req, res) => {
   try {
     const playlist = await Playlist.findById(req.params.id).populate('songs');
@@ -38,7 +32,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST /api/playlists - Créer une nouvelle playlist
+// Creer une playlist
 router.post('/', async (req, res) => {
   try {
     const { name, description, coverUrl } = req.body;
@@ -50,7 +44,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT /api/playlists/:id - Mettre à jour une playlist
+// Modifier une playlist
 router.put('/:id', async (req, res) => {
   try {
     const { name, description, coverUrl } = req.body;
@@ -68,7 +62,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// POST /api/playlists/:id/songs - Ajouter une musique à la playlist
+// Ajouter une musique a la playlist
 router.post('/:id/songs', async (req, res) => {
   try {
     const { songId } = req.body;
@@ -76,7 +70,7 @@ router.post('/:id/songs', async (req, res) => {
     if (!playlist) {
       return res.status(404).json({ message: 'Playlist non trouvée' });
     }
-    // Eviter les doublons
+    // Pas de doublons
     if (playlist.songs.includes(songId)) {
       return res.status(400).json({ message: 'Cette musique est déjà dans la playlist' });
     }
@@ -89,7 +83,7 @@ router.post('/:id/songs', async (req, res) => {
   }
 });
 
-// DELETE /api/playlists/:id/songs/:songId - Retirer une musique de la playlist
+// Retirer une musique
 router.delete('/:id/songs/:songId', async (req, res) => {
   try {
     const playlist = await Playlist.findById(req.params.id);
@@ -105,7 +99,7 @@ router.delete('/:id/songs/:songId', async (req, res) => {
   }
 });
 
-// DELETE /api/playlists/:id - Supprimer une playlist
+// Supprimer une playlist
 router.delete('/:id', async (req, res) => {
   try {
     const playlist = await Playlist.findByIdAndDelete(req.params.id);

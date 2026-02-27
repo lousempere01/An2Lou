@@ -14,10 +14,10 @@
     <div class="username-modal">
       <i class="fas fa-headphones-alt username-icon"></i>
       <h2>Bienvenue sur An2Lou</h2>
-      <p>Entrez votre nom pour accéder à votre bibliothèque musicale</p>
+      <p>Entrez votre nom pour acceder au site</p>
       <input type="text" id="usernameInput" placeholder="Votre prénom..." maxlength="30" autofocus>
       <button class="btn btn-primary" id="usernameBtn">
-        <i class="fas fa-music"></i> C'est parti !
+        <i class="fas fa-music"></i> Entrer
       </button>
     </div>
   </div>
@@ -49,8 +49,8 @@
     <!-- ======== Section Musiques ======== -->
     <section class="page-section active" id="songsPage">
       <div class="page-header">
-        <h1><i class="fas fa-music"></i> Ma Bibliothèque</h1>
-        <p>Gérez votre collection de musiques</p>
+        <h1><i class="fas fa-music"></i> Musiques</h1>
+        <p>Gerez votre collection</p>
       </div>
 
       <!-- Stats -->
@@ -94,18 +94,18 @@
             <div class="form-group">
               <label for="newSongGenre">Genre</label>
               <select id="newSongGenre">
-                <option value="Pop">🎵 Pop</option>
-                <option value="Rock">🎸 Rock</option>
-                <option value="Hip-Hop">🎤 Hip-Hop</option>
-                <option value="Rap">🔥 Rap</option>
-                <option value="Électro">⚡ Électro</option>
-                <option value="Jazz">🎷 Jazz</option>
-                <option value="Classique">🎻 Classique</option>
-                <option value="R&B">💜 R&B</option>
-                <option value="Reggae">🌴 Reggae</option>
-                <option value="Metal">🤘 Metal</option>
-                <option value="Folk">🪕 Folk</option>
-                <option value="Autre">🎶 Autre</option>
+                <option value="Pop">Pop</option>
+                <option value="Rock">Rock</option>
+                <option value="Hip-Hop">Hip-Hop</option>
+                <option value="Rap">Rap</option>
+                <option value="Électro">Électro</option>
+                <option value="Jazz">Jazz</option>
+                <option value="Classique">Classique</option>
+                <option value="R&B">R&B</option>
+                <option value="Reggae">Reggae</option>
+                <option value="Metal">Metal</option>
+                <option value="Folk">Folk</option>
+                <option value="Autre">Autre</option>
               </select>
             </div>
           </div>
@@ -159,7 +159,7 @@
           </select>
           <select class="filter-select" id="filterFavorite">
             <option value="">Tous</option>
-            <option value="true">⭐ Favoris</option>
+            <option value="true">Favoris seulement</option>
           </select>
           <select class="filter-select" id="sortSelect">
             <option value="createdAt-desc">Plus récents</option>
@@ -186,8 +186,8 @@
     <!-- ======== Section Playlists ======== -->
     <section class="page-section" id="playlistsPage">
       <div class="page-header">
-        <h1><i class="fas fa-list"></i> Mes Playlists</h1>
-        <p>Créez et gérez vos playlists personnalisées</p>
+        <h1><i class="fas fa-list"></i> Playlists</h1>
+        <p>Gerez vos playlists</p>
       </div>
 
       <!-- Créer une playlist -->
@@ -258,8 +258,8 @@
     <!-- ======== Section Chat ======== -->
     <section class="page-section" id="chatPage">
       <div class="page-header">
-        <h1><i class="fas fa-comments"></i> Chat en direct</h1>
-        <p>Discutez musique en temps réel avec les autres utilisateurs</p>
+        <h1><i class="fas fa-comments"></i> Chat</h1>
+        <p>Discutez en temps reel</p>
       </div>
 
       <div class="chat-container">
@@ -274,7 +274,7 @@
           <div class="chat-messages" id="chatMessages"></div>
           <div class="typing-indicator" id="typingIndicator"></div>
           <div class="chat-input-area">
-            <input type="text" id="chatInput" placeholder="Partagez vos découvertes musicales..." maxlength="1000">
+            <input type="text" id="chatInput" placeholder="Votre message..." maxlength="1000">
             <button class="btn btn-primary" id="sendMessageBtn">
               <i class="fas fa-paper-plane"></i>
             </button>

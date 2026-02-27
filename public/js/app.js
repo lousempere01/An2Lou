@@ -1,10 +1,3 @@
-// ============================================================
-// Projet An2Lou - Gestionnaire de Musiques & Chat
-// Auteurs : Lou Sempere
-// Fichier : app.js (Frontend)
-// ============================================================
-
-// ---- État global ----
 let currentUser = '';
 let socket = null;
 let typingTimeout = null;
@@ -31,9 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
   loadPlaylists();
 });
 
-// ============================================================
-// NAVIGATION
-// ============================================================
 function initNavigation() {
   $$('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -49,9 +39,6 @@ function initNavigation() {
   });
 }
 
-// ============================================================
-// COLLAPSIBLE SECTIONS
-// ============================================================
 function initCollapsibles() {
   ['toggleAddSong', 'toggleAddPlaylist'].forEach(id => {
     const header = $(`#${id}`);
@@ -63,9 +50,6 @@ function initCollapsibles() {
   });
 }
 
-// ============================================================
-// COVER PREVIEW
-// ============================================================
 function initCoverPreview() {
   const coverInput = $('#newSongCover');
   const preview = $('#coverPreview');
@@ -83,9 +67,6 @@ function initCoverPreview() {
   }
 }
 
-// ============================================================
-// MODAL NOM D'UTILISATEUR
-// ============================================================
 function initUsernameModal() {
   const saved = localStorage.getItem('an2lou_username');
   if (saved) {
@@ -111,12 +92,8 @@ function submitUsername() {
   localStorage.setItem('an2lou_username', name);
   $('#usernameModal').classList.add('hidden');
   initChat();
-  showToast(`Bienvenue, ${name} ! 🎶`, 'success');
+  showToast('Bienvenue ' + name, 'success');
 }
-
-// ============================================================
-// GESTION DES MUSIQUES
-// ============================================================
 
 async function loadSongs() {
   const params = new URLSearchParams();
@@ -215,23 +192,9 @@ function updateStats(songs) {
 }
 
 function animateNumber(el, target) {
-  if (!el) return;
-  const current = parseInt(el.textContent) || 0;
-  if (current === target) return;
-
-  const step = target > current ? 1 : -1;
-  const duration = 300;
-  const steps = Math.abs(target - current);
-  const interval = duration / steps;
-  let count = current;
-  const timer = setInterval(() => {
-    count += step;
-    el.textContent = count;
-    if (count === target) clearInterval(timer);
-  }, Math.max(interval, 30));
+  if (el) el.textContent = target;
 }
 
-// ---- Ajout musique ----
 function initAddSongForm() {
   $('#addSongForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -270,28 +233,20 @@ function initAddSongForm() {
   });
 }
 
-// ---- Favori ----
 async function toggleFavorite(id) {
   try {
     const res = await fetch(`/api/songs/${id}/favorite`, { method: 'PATCH' });
     if (res.ok) {
       const song = await res.json();
       loadSongs();
-      showToast(song.favorite ? 'Ajouté aux favoris ❤️' : 'Retiré des favoris', song.favorite ? 'success' : 'info');
+      showToast(song.favorite ? 'Ajouté aux favoris' : 'Retiré des favoris', song.favorite ? 'success' : 'info');
     }
   } catch (err) {
     showToast('Erreur', 'error');
   }
 }
 
-// ---- Suppression ----
 async function deleteSong(id) {
-  const card = document.querySelector(`.song-card[data-id="${id}"]`);
-  if (card) {
-    card.classList.add('deleting');
-    await new Promise(r => setTimeout(r, 350));
-  }
-
   try {
     const res = await fetch(`/api/songs/${id}`, { method: 'DELETE' });
     if (res.ok) {
@@ -304,7 +259,6 @@ async function deleteSong(id) {
   }
 }
 
-// ---- Contrôles ----
 function initSongControls() {
   $('#searchInput').addEventListener('input', () => {
     clearTimeout(debounceTimeout);
@@ -315,9 +269,6 @@ function initSongControls() {
   $('#sortSelect').addEventListener('change', loadSongs);
 }
 
-// ============================================================
-// MODAL ÉDITION MUSIQUE
-// ============================================================
 function initEditSongModal() {
   $('#cancelEditSongBtn').addEventListener('click', closeEditSongModal);
   $('#editSongModal').addEventListener('click', (e) => {
@@ -380,10 +331,6 @@ async function openEditSongModal(id) {
 function closeEditSongModal() {
   $('#editSongModal').classList.remove('active');
 }
-
-// ============================================================
-// GESTION DES PLAYLISTS
-// ============================================================
 
 async function loadPlaylists() {
   try {
@@ -482,7 +429,6 @@ async function deletePlaylist(id) {
   }
 }
 
-// ---- Détail Playlist ----
 function initPlaylistDetail() {
   $('#backToPlaylists').addEventListener('click', closePlaylistDetail);
 }
@@ -574,7 +520,6 @@ async function removeSongFromPlaylist(songId) {
   }
 }
 
-// ---- Modal ajouter à la playlist ----
 function initAddToPlaylistModal() {
   $('#addSongToPlaylistBtn').addEventListener('click', openAddToPlaylistModal);
   $('#closeAddToPlaylistBtn').addEventListener('click', closeAddToPlaylistModal);
@@ -690,9 +635,6 @@ async function addSongToPlaylist(songId, btnEl) {
   }
 }
 
-// ============================================================
-// CHAT EN TEMPS RÉEL
-// ============================================================
 function initChat() {
   socket = io();
 
@@ -803,10 +745,6 @@ function scrollChatToBottom() {
   const container = $('#chatMessages');
   container.scrollTop = container.scrollHeight;
 }
-
-// ============================================================
-// UTILITAIRES
-// ============================================================
 
 function showToast(message, type = 'info') {
   const container = $('#toastContainer');

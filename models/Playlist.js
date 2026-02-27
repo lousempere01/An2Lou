@@ -1,8 +1,3 @@
-// ============================================================
-// Projet An2Lou - Gestionnaire de Musiques & Chat
-// Auteurs : Lou Sempere
-// Modèle Mongoose : Playlist
-// ============================================================
 
 const mongoose = require('mongoose');
 

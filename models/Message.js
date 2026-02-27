@@ -1,8 +1,3 @@
-// ============================================================
-// Projet An2Lou - Gestionnaire de tâches & Chat
-// Auteurs : Lou Sempere
-// Modèle Mongoose : Message (Chat)
-// ============================================================
 
 const mongoose = require('mongoose');
 

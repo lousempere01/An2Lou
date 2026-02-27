@@ -1,20 +1,14 @@
-// ============================================================
-// Projet An2Lou - Gestionnaire de Musiques & Chat
-// Auteurs : Lou Sempere
-// Routes API : Songs (CRUD)
-// ============================================================
-
 const express = require('express');
 const router = express.Router();
 const Song = require('../models/Song');
 
-// GET /api/songs - Récupérer toutes les musiques (avec tri et recherche)
+// Recuperer toutes les musiques
 router.get('/', async (req, res) => {
   try {
     const { search, sort, order, genre, favorite } = req.query;
     let filter = {};
 
-    // Recherche par titre ou artiste
+    // Recherche
     if (search) {
       filter.$or = [
         { title: { $regex: search, $options: 'i' } },
@@ -23,12 +17,12 @@ router.get('/', async (req, res) => {
       ];
     }
 
-    // Filtre par genre
+    // Genre
     if (genre) {
       filter.genre = genre;
     }
 
-    // Filtre par favoris
+    // Favoris
     if (favorite !== undefined && favorite !== '') {
       filter.favorite = favorite === 'true';
     }
@@ -47,7 +41,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/songs/:id - Récupérer une musique par son ID
+// Recuperer une musique par ID
 router.get('/:id', async (req, res) => {
   try {
     const song = await Song.findById(req.params.id);
@@ -60,7 +54,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST /api/songs - Créer une nouvelle musique
+// Creer une musique
 router.post('/', async (req, res) => {
   try {
     const { title, artist, album, genre, coverUrl, duration, year } = req.body;
@@ -72,7 +66,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT /api/songs/:id - Mettre à jour une musique
+// Modifier une musique
 router.put('/:id', async (req, res) => {
   try {
     const { title, artist, album, genre, coverUrl, duration, year, favorite } = req.body;
@@ -90,7 +84,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// PATCH /api/songs/:id/favorite - Basculer le statut favori
+// Toggle favori
 router.patch('/:id/favorite', async (req, res) => {
   try {
     const song = await Song.findById(req.params.id);
@@ -105,7 +99,7 @@ router.patch('/:id/favorite', async (req, res) => {
   }
 });
 
-// DELETE /api/songs/:id - Supprimer une musique
+// Supprimer une musique
 router.delete('/:id', async (req, res) => {
   try {
     const song = await Song.findByIdAndDelete(req.params.id);
